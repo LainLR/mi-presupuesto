@@ -1,0 +1,50 @@
+plugins {
+    id 'com.android.application'
+}
+
+// Cada compilación en GitHub sube el número de versión, así el celular acepta la actualización.
+def buildNumber = Integer.parseInt(System.getenv("GITHUB_RUN_NUMBER") ?: "1")
+
+android {
+    namespace 'pe.yamila.presupuesto'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId 'pe.yamila.presupuesto'
+        minSdk 24
+        targetSdk 34
+        versionCode buildNumber
+        versionName "1.0." + buildNumber
+    }
+
+    // Firma fija: GitHub crea presupuesto.jks desde el secreto KEYSTORE_BASE64 antes de compilar.
+    // Todas las versiones salen con la misma llave, así se actualizan sin borrar tus datos.
+    signingConfigs {
+        release {
+            storeFile file('presupuesto.jks')
+            storePassword 'presupuesto2026'
+            keyAlias 'presupuesto'
+            keyPassword 'presupuesto2026'
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.release
+        }
+        debug {
+            signingConfig signingConfigs.release
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    lint {
+        checkReleaseBuilds false
+        abortOnError false
+    }
+}
